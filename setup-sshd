@@ -43,12 +43,25 @@ write_key() {
   chmod 0700 -R "${JENKINS_AGENT_HOME}/.ssh"
 }
 
+function set_permission_on_workspace() {
+  echo "Setting up workspace dir [${JENKINS_AGENT_HOME}/workspace]"
+  if [ -d ${JENKINS_AGENT_HOME}/workspace ]; then
+    chown jenkins:jenkins ${JENKINS_AGENT_HOME}/workspace
+  else
+    mkdir ${JENKINS_AGENT_HOME}/workspace
+    chown jenkins:jenkins ${JENKINS_AGENT_HOME}/workspace
+  fi
+  chmod 775 ${JENKINS_AGENT_HOME}/workspace
+}
+
 if [[ ${JENKINS_AGENT_SSH_PUBKEY} == ssh-* ]]; then
   write_key "${JENKINS_AGENT_SSH_PUBKEY}"
 fi
 if [[ ${JENKINS_SLAVE_SSH_PUBKEY} == ssh-* ]]; then
   write_key "${JENKINS_SLAVE_SSH_PUBKEY}"
 fi
+
+set_permission_on_workspace
 
 # ensure variables passed to docker container are also exposed to ssh sessions
 env | grep _ >> /etc/environment
