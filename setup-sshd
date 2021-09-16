@@ -37,6 +37,11 @@ write_key() {
   # ID_GROUP contains the user:group of JENKINS_AGENT_HOME directory
   ID_GROUP=$(stat -c '%U:%G' "${JENKINS_AGENT_HOME}")
 
+  # The may be old keys hanging about that we should remove.
+  if [ -d "${JENKINS_AGENT_HOME}/.ssh" ]; then
+    rm -rf "${JENKINS_AGENT_HOME}/.ssh"
+  fi
+
   mkdir -p "${JENKINS_AGENT_HOME}/.ssh"
   echo "$1" > "${JENKINS_AGENT_HOME}/.ssh/authorized_keys"
   chown -Rf "${ID_GROUP}" "${JENKINS_AGENT_HOME}/.ssh"
@@ -44,21 +49,17 @@ write_key() {
 }
 
 function set_permission_on_workspace() {
-  echo "Setting up workspace dir [${JENKINS_AGENT_HOME}/workspace]"
-  if [ -d ${JENKINS_AGENT_HOME}/workspace ]; then
-    chown jenkins:jenkins ${JENKINS_AGENT_HOME}/workspace
-  else
-    mkdir ${JENKINS_AGENT_HOME}/workspace
-    chown jenkins:jenkins ${JENKINS_AGENT_HOME}/workspace
+  echo "Setting up workspace dir [${JENKINS_AGENT_WORK_DIR}/workspace]"
+  if [ ! -d ${JENKINS_AGENT_WORK_DIR}/workspace ]; then
+    mkdir ${JENKINS_AGENT_WORK_DIR}/workspace
   fi
-  chmod 775 ${JENKINS_AGENT_HOME}/workspace
+  
+  chown -R root:root ${JENKINS_AGENT_WORK_DIR}/workspace
+  chmod 775 ${JENKINS_AGENT_WORK_DIR}/workspace
 }
 
 if [[ ${JENKINS_AGENT_SSH_PUBKEY} == ssh-* ]]; then
   write_key "${JENKINS_AGENT_SSH_PUBKEY}"
-fi
-if [[ ${JENKINS_SLAVE_SSH_PUBKEY} == ssh-* ]]; then
-  write_key "${JENKINS_SLAVE_SSH_PUBKEY}"
 fi
 
 set_permission_on_workspace

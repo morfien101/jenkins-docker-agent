@@ -19,6 +19,7 @@ docker run \
 --rm \
 --name jenkins-agent \
 -v /var/run/docker.sock:/var/run/docker.sock \
+-v /var/jenkins:/var/jenkins \
 -p 23:22 \
 -e "JENKINS_AGENT_SSH_PUBKEY=$JENKINS_PUBLIC_KEY" \
 morfien101/jenkins-ssh-docker:latest

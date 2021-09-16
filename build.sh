@@ -1,5 +1,5 @@
 #!/bin/bash
-version=0.0.2
+version=0.1.1
 
 CONTAINER_NAME="morfien101/jenkins-ssh-docker"
 CONTAINER_VERSION=$version
